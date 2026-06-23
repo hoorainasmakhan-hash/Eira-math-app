@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standard 7 Math Quest</title>
+    <style>
+        /* Colorful, clean, kid-friendly styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f2fe, #e0e7ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .app-container {
+            background: white;
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            border: 4px solid #818cf8;
+        }
+
+        h1 {
+            color: #4f46e5;
+            margin-top: 0;
+            font-size: 28px;
+        }
+
+        .score-board {
+            background: #f3f4f6;
+            padding: 10px;
+            border-radius: 12px;
+            font-weight: bold;
+            color: #374151;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .problem-box {
+            background: #eef2ff;
+            min-height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 600;
+            color: #1e1b4b;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 2px dashed #c7d2fe;
+        }
+
+        input[type="number"] {
+            width: 80%;
+            padding: 12px;
+            font-size: 20px;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            text-align: center;
+            outline: none;
+            margin-bottom: 20px;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus {
+            border-color: #6366f1;
+        }
+
+        button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 80%;
+            transition: transform 0.1s, background-color 0.2s;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .feedback {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            min-height: 27px;
+        }
+
+        .correct { color: #10b981; }
+        .incorrect { color: #ef4444; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <h1>Math Quest (Std 7)</h1>
+    
+    <div class="score-board">
+        <span>Score: <span id="score">0</span></span>
+        <span>Streak: <span id="streak">0</span>🔥</span>
+    </div>
+
+    <div class="problem-box" id="problem">
+        Loading problem...
+    </div>
+
+    <input type="number" id="answer-input" placeholder="Type your answer here" autocomplete="off">
+    <br>
+    <button id="action-btn" onclick="checkAnswer()">Submit Answer</button>
+
+    <div class="feedback" id="feedback"></div>
+</div>
+
+<script>
+    let currentAnswer = 0;
+    let score = 0;
+    let streak = 0;
+    let isAnswered = false;
+
+    // Generates 7th Grade appropriate questions
+    function generateProblem() {
+        const types = ['algebra', 'integers', 'percentage', 'geometry'];
+        const chosenType = types[Math.floor(Math.random() * types.length)];
+        let questionText = "";
+
+        switch(chosenType) {
+            case 'algebra':
+                // Simple equations: ax + b = c
+                let x = Math.floor(Math.random() * 10) + 1; // answer
+                let a = Math.floor(Math.random() * 5) + 2; 
+                let b = Math.floor(Math.random() * 10) + 1;
+                let c = (a * x) + b;
+                questionText = `Solve for x: ${a}x + ${b} = ${c}`;
+                currentAnswer = x;
+                break;
+
+            case 'integers':
+                // Negative and positive rules
+                let n1 = Math.floor(Math.random() * 30) - 15;
+                let n2 = Math.floor(Math.random() * 30) - 15;
+                // Avoid 0 to keep it interesting
+                if(n1 === 0) n1 = 5;
+                if(n2 === 0) n2 = -3;
+                
+                let operation = Math.random() > 0.5 ? '+' : '-';
+                if (operation === '+') {
+                    questionText = `Evaluate: ${n1} + (${n2})`;
+                    currentAnswer = n1 + n2;
+                } else {
+                    questionText = `Evaluate: ${n1} - (${n2})`;
+                    currentAnswer = n1 - n2;
+                }
+                break;
+
+            case 'percentage':
+                // Finding percentage of a number
+                let percent = [10, 20, 25, 50, 75][Math.floor(Math.random() * 5)];
+                let base = (Math.floor(Math.random() * 8) + 1) * 50; // 50, 100, 150...
+                questionText = `What is ${percent}% of ${base}?`;
+                currentAnswer = (percent / 100) * base;
+                break;
+
+            case 'geometry':
+                // Complementary/Supplementary angles or simple area
+                if (Math.random() > 0.5) {
+                    let givenAngle = Math.floor(Math.random() * 70) + 10;
+                    questionText = `Find the complementary angle of ${givenAngle}°`;
+                    currentAnswer = 90 - givenAngle;
+                } else {
+                    let givenAngle = Math.floor(Math.random() * 140) + 20;
+                    questionText = `Find the supplementary angle of ${givenAngle}°`;
+                    currentAnswer = 180 - givenAngle;
+                }
+                break;
+        }
+
+        document.getElementById('problem').innerText = questionText;
+        document.getElementById('answer-input').value = "";
+        document.getElementById('feedback').innerText = "";
+        document.getElementById('feedback').className = "feedback";
+        document.getElementById('action-btn').innerText = "Submit Answer";
+        isAnswered = false;
+    }
+
+    function checkAnswer() {
+        const inputField = document.getElementById('answer-input');
+        const feedbackField = document.getElementById('feedback');
+        const actionBtn = document.getElementById('action-btn');
+
+        if (isAnswered) {
+            // If already answered, button acts as "Next"
+            generateProblem();
+            inputField.focus();
+            return;
+        }
+
+        const userAnswer = parseInt(inputField.value);
+
+        if (isNaN(userAnswer)) {
+            feedbackField.innerText = "Please enter a number!";
+            feedbackField.className = "feedback incorrect";
+            return;
+        }
+
+        if (userAnswer === currentAnswer) {
+            feedbackField.innerText = "🎉 Correct! Great job!";
+            feedbackField.className = "feedback correct";
+            score += 10;
+            streak += 1;
+            document.getElementById('score').innerText = score;
+            document.getElementById('streak').innerText = streak;
+        } else {
+            feedbackField.innerText = `❌ Incorrect. The right answer was ${currentAnswer}.`;
+            feedbackField.className = "feedback incorrect";
+            streak = 0; // Reset streak
+            document.getElementById('streak').innerText = streak;
+        }
+
+        actionBtn.innerText = "Next Question";
+        isAnswered = true;
+    }
+
+    // Allow pressing "Enter" key to submit/continue
+    document.getElementById('answer-input').addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+            checkAnswer();
+        }
+    });
+
+    // Start the first problem on load
+    window.onload = generateProblem;
+</script>
+
+</body>
+</html>
